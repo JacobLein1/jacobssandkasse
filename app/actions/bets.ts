@@ -25,6 +25,14 @@ export async function placeBet(_prev: BetState, formData: FormData): Promise<Bet
   if (isNaN(odds) || odds <= 0) return { error: 'Ugyldige odds.' }
   if (isNaN(amount) || amount < 10) return { error: 'Minste innsats er 10 kr.' }
 
+  const { data: match } = await supabase
+    .from('odds')
+    .select('settled')
+    .eq('match_id', matchId)
+    .single()
+
+  if (match?.settled) return { error: 'Bettingen er lukket for denne kampen.' }
+
   const { error } = await supabase.rpc('place_bet', {
     p_match_id: matchId,
     p_home_team: homeTeam,

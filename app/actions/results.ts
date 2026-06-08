@@ -33,6 +33,13 @@ export async function settleMatch(
   if (isNaN(homeGoals) || homeGoals < 0) return { error: 'Ugyldig antall hjemmemål.' }
   if (isNaN(awayGoals) || awayGoals < 0) return { error: 'Ugyldig antall bortemål.' }
 
+  const { error: settledError } = await supabase
+    .from('odds')
+    .update({ settled: true })
+    .eq('match_id', matchId)
+
+  if (settledError) return { error: settledError.message }
+
   // Fetch all pending bets for this match
   const { data: bets, error: betsError } = await supabase
     .from('bets')

@@ -19,6 +19,7 @@ export interface MatchOdds {
   bookmaker: string | null
   totals: TotalsMap | null
   updated_at: string
+  settled: boolean
 }
 
 interface MatchListProps {
@@ -86,10 +87,17 @@ function MatchCard({ match }: { match: MatchOdds }) {
     : []
 
   return (
-    <article className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-4 shadow-lg">
-      <p className="text-gray-400 text-sm mb-5 capitalize">
-        {fmtDate(match.match_date)}&nbsp;&middot;&nbsp;{fmtTime(match.match_date)}
-      </p>
+    <article className={`bg-gray-900 border rounded-2xl p-5 mb-4 shadow-lg ${match.settled ? 'border-gray-800 opacity-60' : 'border-gray-800'}`}>
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-gray-400 text-sm capitalize">
+          {fmtDate(match.match_date)}&nbsp;&middot;&nbsp;{fmtTime(match.match_date)}
+        </p>
+        {match.settled && (
+          <span className="text-xs font-semibold bg-gray-800 text-gray-400 rounded-full px-2.5 py-1">
+            Avgjort
+          </span>
+        )}
+      </div>
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col items-center gap-1 w-5/12">
@@ -140,7 +148,9 @@ function MatchCard({ match }: { match: MatchOdds }) {
         <span>Oppdatert {timeAgo(match.updated_at)}</span>
       </div>
 
-      <p className="text-center text-xs text-gray-600 mt-3">Trykk for å spille →</p>
+      {!match.settled && (
+        <p className="text-center text-xs text-gray-600 mt-3">Trykk for å spille →</p>
+      )}
     </article>
   )
 }
@@ -159,8 +169,8 @@ export function MatchList({ matches, userId }: MatchListProps) {
       {matches.map(match => (
         <div
           key={match.match_id}
-          onClick={() => setActiveMatch(match)}
-          className="cursor-pointer"
+          onClick={() => !match.settled && setActiveMatch(match)}
+          className={match.settled ? 'cursor-default' : 'cursor-pointer'}
         >
           <MatchCard match={match} />
         </div>

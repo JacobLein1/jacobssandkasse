@@ -11,13 +11,14 @@ interface Props {
 
 export function MatchesClient({ matches, userId }: Props) {
   const [activeTeam, setActiveTeam] = useState<string | null>(null)
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'settled'>('all')
   const [infoOpen, setInfoOpen] = useState(false)
 
   const teams = [...new Set(matches.flatMap(m => [m.home_team, m.away_team]))].sort()
 
-  const filtered = activeTeam
-    ? matches.filter(m => m.home_team === activeTeam || m.away_team === activeTeam)
-    : matches
+  const filtered = matches
+    .filter(m => statusFilter === 'all' || (statusFilter === 'open' ? !m.settled : m.settled))
+    .filter(m => !activeTeam || m.home_team === activeTeam || m.away_team === activeTeam)
 
   return (
     <>
@@ -35,6 +36,20 @@ export function MatchesClient({ matches, userId }: Props) {
           </p>
         )}
       </button>
+
+      <div className="flex gap-2 mb-4">
+        {(['all', 'open', 'settled'] as const).map(s => (
+          <button
+            key={s}
+            onClick={() => setStatusFilter(s)}
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              statusFilter === s ? 'bg-red-700 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            {s === 'all' ? 'Alle' : s === 'open' ? 'Åpne' : 'Avgjorte'}
+          </button>
+        ))}
+      </div>
 
       <div className="flex gap-2 overflow-x-auto pb-3 mb-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
