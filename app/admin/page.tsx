@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { BalanceEditor } from './BalanceEditor'
+import { Logo } from '@/components/Logo'
 
 interface Profile {
   id: string
@@ -36,13 +37,21 @@ export default async function AdminPage() {
     <main className="min-h-screen bg-gray-950 text-white">
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Admin</h1>
-            <p className="text-gray-400 text-sm mt-0.5">Brukere og saldoer</p>
+          <div className="flex items-center gap-3">
+            <Logo size={36} />
+            <div>
+              <h1 className="text-2xl font-bold">Admin</h1>
+              <p className="text-gray-400 text-sm mt-0.5">Brukere og saldoer</p>
+            </div>
           </div>
-          <Link href="/" className="text-gray-400 hover:text-white text-sm transition-colors">
-            ← Tilbake
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/admin/resultater" className="text-red-400 hover:text-red-300 text-sm transition-colors">
+              Resultater →
+            </Link>
+            <Link href="/" className="text-gray-400 hover:text-white text-sm transition-colors">
+              ← Tilbake
+            </Link>
+          </div>
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">

@@ -1,6 +1,7 @@
 import { createClient as createServerClient } from '@/lib/supabase-server'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { Logo } from '@/components/Logo'
 
 interface Profile {
   id: string
@@ -44,11 +45,14 @@ export default async function LeaderboardPage() {
       <div className="max-w-xl mx-auto px-4 py-10">
 
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">🏆 Ledertavle</h1>
-            <p className="text-gray-400 text-sm mt-0.5">
-              Startbalanse: 1&nbsp;000&nbsp;kr
-            </p>
+          <div className="flex items-center gap-3">
+            <Logo size={36} />
+            <div>
+              <h1 className="text-2xl font-bold">🏆 Ledertavle</h1>
+              <p className="text-gray-400 text-sm mt-0.5">
+                Startbalanse: 1&nbsp;000&nbsp;kr
+              </p>
+            </div>
           </div>
           <Link
             href="/"
