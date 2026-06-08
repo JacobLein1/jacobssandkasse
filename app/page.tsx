@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-
-export const revalidate = 300
+import { createClient as createServerClient } from '@/lib/supabase-server'
+import Link from 'next/link'
+import { logout } from '@/app/actions/auth'
 
 interface MatchOdds {
   id: number
@@ -224,20 +225,78 @@ function MatchCard({ match }: { match: MatchOdds }) {
   )
 }
 
-export default async function Home() {
-  let matches: MatchOdds[] = []
-  let fetchError: string | null = null
+interface Profile {
+  username: string | null
+  balance: number
+  is_admin: boolean
+}
 
-  try {
-    matches = await getNorwayMatches()
-  } catch {
-    fetchError = 'Couldnt load odds'
-  }
+async function getProfile(): Promise<{ user: { id: string } | null; profile: Profile | null }> {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { user: null, profile: null }
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('username, balance, is_admin')
+    .eq('id', user.id)
+    .single()
+
+  return { user, profile: data }
+}
+
+export default async function Home() {
+  const [{ user, profile }, matchResult] = await Promise.all([
+    getProfile(),
+    getNorwayMatches().then(m => ({ matches: m, error: null })).catch(() => ({ matches: [] as MatchOdds[], error: 'Kunne ikke laste odds.' })),
+  ])
+
+  const { matches, error: fetchError } = matchResult
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
       <div className="max-w-xl mx-auto px-4 py-10">
-        {/* Header */}
+
+        {/* User bar */}
+        <div className="flex items-center justify-between mb-8 min-h-[2.5rem]">
+          {user && profile ? (
+            <>
+              <div className="flex items-center gap-3">
+                <div>
+                  <span className="font-semibold text-sm">{profile.username}</span>
+                  <span className="text-gray-400 text-sm"> · kr {Number(profile.balance).toFixed(2)}</span>
+                </div>
+                {profile.is_admin && (
+                  <Link
+                    href="/admin"
+                    className="text-xs bg-red-700/40 text-red-300 rounded px-2 py-1 hover:bg-red-700/60 transition-colors"
+                  >
+                    Admin
+                  </Link>
+                )}
+              </div>
+              <form action={logout}>
+                <button type="submit" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Logg ut
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="flex gap-3 ml-auto">
+              <Link href="/login" className="text-gray-300 hover:text-white text-sm transition-colors">
+                Logg inn
+              </Link>
+              <Link
+                href="/register"
+                className="bg-red-700 hover:bg-red-600 text-white text-sm rounded-lg px-3 py-1.5 transition-colors"
+              >
+                Registrer deg
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Page title */}
         <div className="text-center mb-8">
           <div className="text-6xl mb-3">🇳🇴</div>
           <h1 className="text-2xl font-bold tracking-tight">Norge i VM 2026</h1>
