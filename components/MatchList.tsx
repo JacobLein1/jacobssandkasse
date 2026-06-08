@@ -104,7 +104,7 @@ function MatchCard({ match }: { match: MatchOdds }) {
           <span className="text-5xl leading-none">{flag(match.home_team)}</span>
           <span className="text-sm font-semibold text-center mt-1">{match.home_team}</span>
         </div>
-        <span className="text-gray-600 text-sm font-medium">vs</span>
+        <span className="text-muted text-sm font-medium">vs</span>
         <div className="flex flex-col items-center gap-1 w-5/12">
           <span className="text-5xl leading-none">{flag(match.away_team)}</span>
           <span className="text-sm font-semibold text-center mt-1">{match.away_team}</span>
@@ -127,7 +127,7 @@ function MatchCard({ match }: { match: MatchOdds }) {
 
       {totalsLines.length > 0 && (
         <div className="border-t border-gray-800 pt-4 mt-2">
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Over/Under mål</p>
+          <p className="text-xs text-muted uppercase tracking-widest mb-2">Over/Under mål</p>
           {totalsLines.map(([line, odds]) => (
             <div key={line} className="grid grid-cols-2 gap-2 mb-2 last:mb-0">
               <div className="bg-detail rounded-xl px-4 py-3">
@@ -143,13 +143,13 @@ function MatchCard({ match }: { match: MatchOdds }) {
         </div>
       )}
 
-      <div className="mt-4 flex justify-between text-xs text-gray-600">
+      <div className="mt-4 flex justify-between text-xs text-muted">
         {match.bookmaker ? <span>via {match.bookmaker}</span> : <span />}
         <span>Oppdatert {timeAgo(match.updated_at)}</span>
       </div>
 
       {!match.settled && (
-        <p className="text-center text-xs text-gray-600 mt-3">Trykk for å spille →</p>
+        <p className="text-center text-xs text-muted mt-3">Trykk for å spille →</p>
       )}
     </article>
   )

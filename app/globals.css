@@ -6,6 +6,7 @@
   --page-bg: #111827; /* ← endre denne for å bytte bakgrunnsfarge på alle sider */
   --card-bg: #1f2937; /* ← endre denne for å bytte farge på kampkortene */
   --detail-bg: #374151; /* ← endre denne for å bytte farge på detaljer inni kortene */
+  --muted-text: #9ca3af; /* ← endre denne for å bytte farge på liten hjelpetekst i kortene */
 }
 
 @theme inline {
@@ -14,6 +15,7 @@
   --color-page: var(--page-bg);
   --color-card: var(--card-bg);
   --color-detail: var(--detail-bg);
+  --color-muted: var(--muted-text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
