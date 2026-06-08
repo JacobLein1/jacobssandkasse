@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { login, type AuthState } from '@/app/actions/auth'
+import { Logo } from '@/components/Logo'
 
 export default function LoginPage() {
   const [state, action, isPending] = useActionState<AuthState, FormData>(login, null)
@@ -11,23 +12,25 @@ export default function LoginPage() {
     <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🇳🇴</div>
+          <div className="mb-3">
+            <Logo size={48} />
+          </div>
           <h1 className="text-2xl font-bold">Logg inn</h1>
         </div>
 
         <form action={action} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm text-gray-400 mb-1">
-              E-post
+            <label htmlFor="username" className="block text-sm text-gray-400 mb-1">
+              Brukernavn
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="username"
+              name="username"
+              type="text"
               required
-              autoComplete="email"
+              autoComplete="username"
               className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500"
-              placeholder="deg@eksempel.no"
+              placeholder="dittbrukernavn"
             />
           </div>
 

@@ -7,6 +7,7 @@ interface Profile {
   id: string
   username: string | null
   balance: number
+  total_wagered: number
 }
 
 const STARTING_BALANCE = 1000
@@ -19,7 +20,7 @@ async function getLeaderboard(): Promise<Profile[]> {
   )
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, balance')
+    .select('id, username, balance, total_wagered')
     .order('balance', { ascending: false })
   if (error) throw error
   return data ?? []
@@ -87,6 +88,9 @@ export default async function LeaderboardPage() {
                     <th className="text-right px-4 py-3 text-gray-400 font-medium">
                       Saldo
                     </th>
+                    <th className="text-right px-4 py-3 text-gray-400 font-medium hidden sm:table-cell">
+                      Spilt
+                    </th>
                     <th className="text-right px-4 py-3 text-gray-400 font-medium">
                       +/−
                     </th>
@@ -129,6 +133,9 @@ export default async function LeaderboardPage() {
                         </td>
                         <td className="px-4 py-3 text-right font-mono font-semibold">
                           kr {Number(profile.balance).toFixed(2)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-sm text-gray-400 hidden sm:table-cell">
+                          kr {Number(profile.total_wagered).toFixed(2)}
                         </td>
                         <td
                           className={`px-4 py-3 text-right font-mono text-sm ${

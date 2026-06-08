@@ -6,13 +6,22 @@ import { redirect } from 'next/navigation'
 export type AuthState = { error: string } | { message: string } | null
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
-  const email = formData.get('email') as string
+  const username = (formData.get('username') as string).trim()
   const password = formData.get('password') as string
 
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (!username) return { error: 'Brukernavn er påkrevd.' }
 
-  if (error) return { error: error.message }
+  const supabase = await createClient()
+
+  const { data: emailData, error: lookupError } = await supabase.rpc('get_email_by_username', {
+    p_username: username,
+  })
+
+  if (lookupError || !emailData) return { error: 'Finner ingen konto med det brukernavnet.' }
+
+  const { error } = await supabase.auth.signInWithPassword({ email: emailData, password })
+
+  if (error) return { error: 'Feil passord.' }
 
   redirect('/')
 }

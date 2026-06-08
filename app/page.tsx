@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase-server'
 import Link from 'next/link'
-import { logout } from '@/app/actions/auth'
 import type { MatchOdds } from '@/components/MatchList'
 import { MatchesClient } from '@/components/MatchesClient'
 import { Logo } from '@/components/Logo'
+import { LogoutButton } from '@/components/LogoutButton'
 
 async function getAllMatches(): Promise<MatchOdds[]> {
   const supabase = createClient(
@@ -85,14 +85,7 @@ export default async function Home() {
                 >
                   Mine spill
                 </Link>
-                <form action={logout}>
-                  <button
-                    type="submit"
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
-                  >
-                    Logg ut
-                  </button>
-                </form>
+                <LogoutButton />
               </div>
             </>
           ) : (

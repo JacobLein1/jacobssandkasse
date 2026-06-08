@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { register, type AuthState } from '@/app/actions/auth'
+import { Logo } from '@/components/Logo'
 
 export default function RegisterPage() {
   const [state, action, isPending] = useActionState<AuthState, FormData>(register, null)
@@ -11,7 +12,9 @@ export default function RegisterPage() {
     <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🇳🇴</div>
+          <div className="mb-3">
+            <Logo size={48} />
+          </div>
           <h1 className="text-2xl font-bold">Registrer deg</h1>
         </div>
 
