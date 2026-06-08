@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #6c6c8f;
+  --foreground: #ededed;
+  --page-bg: #111827; /* ← endre denne for å bytte bakgrunnsfarge på alle sider */
+  --card-bg: #1f2937; /* ← endre denne for å bytte farge på kampkortene */
+  --detail-bg: #374151; /* ← endre denne for å bytte farge på detaljer inni kortene */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-page: var(--page-bg);
+  --color-card: var(--card-bg);
+  --color-detail: var(--detail-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -32,7 +38,8 @@ body {
   width: 100%;
   height: 6px;
   border-radius: 9999px;
-  background: #374151; /* gray-700 */
+  background: #374151;
+  /* gray-700 */
   cursor: pointer;
   outline: none;
 }
@@ -43,14 +50,17 @@ body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #dc2626; /* red-600 */
+  background: #dc2626;
+  /* red-600 */
   cursor: pointer;
-  border: 2px solid #1f2937; /* gray-800 — matches card bg */
+  border: 2px solid #1f2937;
+  /* gray-800 — matches card bg */
   transition: background 0.15s;
 }
 
 .totals-slider::-webkit-slider-thumb:hover {
-  background: #b91c1c; /* red-700 */
+  background: #b91c1c;
+  /* red-700 */
 }
 
 .totals-slider::-moz-range-track {

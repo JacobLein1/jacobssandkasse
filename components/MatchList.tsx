@@ -70,7 +70,7 @@ function OddsCell({
   return (
     <div
       className={`flex flex-col items-center rounded-xl px-3 py-3 gap-1 ${
-        highlight ? 'bg-red-700' : 'bg-gray-800'
+        highlight ? 'bg-red-700' : 'bg-detail'
       }`}
     >
       <span className="text-xs text-gray-400 truncate max-w-full text-center leading-tight">
@@ -87,13 +87,13 @@ function MatchCard({ match }: { match: MatchOdds }) {
     : []
 
   return (
-    <article className={`bg-gray-900 border rounded-2xl p-5 mb-4 shadow-lg ${match.settled ? 'border-gray-800 opacity-60' : 'border-gray-800'}`}>
+    <article className={`bg-card border rounded-2xl p-5 mb-4 shadow-lg ${match.settled ? 'border-gray-800 opacity-60' : 'border-gray-800'}`}>
       <div className="flex items-center justify-between mb-5">
         <p className="text-gray-400 text-sm capitalize">
           {fmtDate(match.match_date)}&nbsp;&middot;&nbsp;{fmtTime(match.match_date)}
         </p>
         {match.settled && (
-          <span className="text-xs font-semibold bg-gray-800 text-gray-400 rounded-full px-2.5 py-1">
+          <span className="text-xs font-semibold bg-detail text-gray-400 rounded-full px-2.5 py-1">
             Avgjort
           </span>
         )}
@@ -130,11 +130,11 @@ function MatchCard({ match }: { match: MatchOdds }) {
           <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Over/Under mål</p>
           {totalsLines.map(([line, odds]) => (
             <div key={line} className="grid grid-cols-2 gap-2 mb-2 last:mb-0">
-              <div className="bg-gray-800 rounded-xl px-4 py-3">
+              <div className="bg-detail rounded-xl px-4 py-3">
                 <p className="text-xs text-gray-400 mb-1">Over {line}</p>
                 <p className="text-xl font-bold tabular-nums">{fmt(odds.over ?? null)}</p>
               </div>
-              <div className="bg-gray-800 rounded-xl px-4 py-3">
+              <div className="bg-detail rounded-xl px-4 py-3">
                 <p className="text-xs text-gray-400 mb-1">Under {line}</p>
                 <p className="text-xl font-bold tabular-nums">{fmt(odds.under ?? null)}</p>
               </div>

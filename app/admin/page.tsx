@@ -34,7 +34,7 @@ export default async function AdminPage() {
   const users = (profiles ?? []) as Profile[]
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <main className="min-h-screen bg-page text-white">
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">

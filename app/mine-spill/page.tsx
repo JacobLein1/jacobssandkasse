@@ -70,7 +70,7 @@ export default async function MineSpillPage() {
   const netResult = totalWon - totalAmount
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <main className="min-h-screen bg-page text-white">
       <div className="max-w-xl mx-auto px-4 py-10">
 
         {/* Header */}

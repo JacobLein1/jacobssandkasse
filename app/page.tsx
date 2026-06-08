@@ -50,7 +50,7 @@ export default async function Home() {
   const { matches, error: fetchError } = matchResult
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <main className="min-h-screen bg-page text-white">
       <div className="max-w-xl mx-auto px-4 py-10">
 
         {/* Header bar */}

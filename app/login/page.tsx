@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [state, action, isPending] = useActionState<AuthState, FormData>(login, null)
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
+    <main className="min-h-screen bg-page text-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="mb-3">
