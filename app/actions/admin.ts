@@ -16,35 +16,18 @@ export async function updateBalance(
 
   const supabase = await createClient()
 
-  // Verify the caller is an admin
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Ikke innlogget.' }
 
-  const { data: caller } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single()
+  const { error } = await supabase.rpc('admin_update_balance', {
+    p_user_id: userId,
+    p_amount: amount,
+  })
 
-  if (!caller?.is_admin) return { error: 'Ingen tilgang.' }
-
-  // Fetch current balance, then set the new one
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('balance')
-    .eq('id', userId)
-    .single()
-
-  if (!profile) return { error: 'Bruker ikke funnet.' }
-
-  const newBalance = Number(profile.balance) + amount
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({ balance: newBalance })
-    .eq('id', userId)
-
-  if (error) return { error: error.message }
+  if (error) {
+    if (error.message.includes('Not an admin')) return { error: 'Ingen tilgang.' }
+    return { error: error.message }
+  }
 
   revalidatePath('/admin')
   return { success: true }

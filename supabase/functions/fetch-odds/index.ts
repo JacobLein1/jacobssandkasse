@@ -6,7 +6,7 @@ const SPORT = 'soccer_fifa_world_cup'
 interface OddsOutcome {
   name: string
   price: number
-  description?: string
+  point?: number
 }
 
 interface OddsMarket {
@@ -28,39 +28,29 @@ interface OddsGame {
   bookmakers: OddsBookmaker[]
 }
 
-function findPlayerOdds(bookmakers: OddsBookmaker[], nameFragment: string): number | null {
-  for (const bookmaker of bookmakers) {
-    const market = bookmaker.markets.find(m => m.key === 'player_to_score_anytime')
-    if (!market) continue
-    const outcome = market.outcomes.find(o =>
-      o.name.toLowerCase().includes(nameFragment.toLowerCase())
-    )
-    if (outcome) return outcome.price
-  }
-  return null
-}
+type TotalsMap = Record<string, { over?: number; under?: number }>
 
 Deno.serve(async () => {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  ) 
+  )
 
   const apiKey = Deno.env.get('ODDS_API_KEY')!
 
-  const h2hRes = await fetch(
-    `${ODDS_API_BASE}/sports/${SPORT}/odds?regions=eu&markets=h2h&oddsFormat=decimal&apiKey=${apiKey}`
+  const res = await fetch(
+    `${ODDS_API_BASE}/sports/${SPORT}/odds?regions=eu&markets=h2h,totals&oddsFormat=decimal&apiKey=${apiKey}`
   )
 
-  if (!h2hRes.ok) {
-    const text = await h2hRes.text()
+  if (!res.ok) {
+    const text = await res.text()
     return new Response(
-      JSON.stringify({ error: `Odds API error ${h2hRes.status}`, detail: text }),
+      JSON.stringify({ error: `Odds API error ${res.status}`, detail: text }),
       { status: 502, headers: { 'Content-Type': 'application/json' } }
     )
   }
 
-  const games: OddsGame[] = await h2hRes.json()
+  const games: OddsGame[] = await res.json()
 
   if (!Array.isArray(games)) {
     return new Response(
@@ -69,68 +59,67 @@ Deno.serve(async () => {
     )
   }
 
-  const records = []
+  console.log(`Fetched ${games.length} games`)
+
   const now = new Date().toISOString()
+  const records = []
 
   for (const game of games) {
-    const isNorwayGame =
-      game.home_team === 'Norway' || game.away_team === 'Norway'
+    console.log(`\n=== ${game.home_team} vs ${game.away_team} ===`)
+    console.log(`  Bookmakers (${game.bookmakers?.length ?? 0}):`)
 
-    // Prefer a bookmaker that has h2h market; fall back to first available
-    const bookmaker =
-      game.bookmakers?.find(b => b.markets.some(m => m.key === 'h2h')) ??
-      game.bookmakers?.[0]
-
-    const h2hMarket = bookmaker?.markets?.find(m => m.key === 'h2h')
-    const outcomes = h2hMarket?.outcomes ?? []
-
-    let haalandOdds: number | null = null
-    let odegaardOdds: number | null = null
-
-    if (isNorwayGame) {
-      try {
-        const propsRes = await fetch(
-          `${ODDS_API_BASE}/sports/${SPORT}/events/${game.id}/odds?regions=eu&markets=player_to_score_anytime&oddsFormat=decimal&apiKey=${apiKey}`
-        )
-        if (propsRes.ok) {
-          const propsData = await propsRes.json()
-          if (propsData.bookmakers) {
-            haalandOdds = findPlayerOdds(propsData.bookmakers, 'haaland')
-            odegaardOdds =
-              findPlayerOdds(propsData.bookmakers, 'odegaard') ??
-              findPlayerOdds(propsData.bookmakers, 'ødegaard')
-          }
-        }
-      } catch {
-        // Player props unavailable — not critical, continue
-      }
+    for (const b of game.bookmakers ?? []) {
+      const keys = b.markets.map(m => m.key).join(', ')
+      console.log(`    [${b.title}] markets: ${keys}`)
     }
+
+    // H2H: first bookmaker that has h2h market
+    const h2hBookmaker = game.bookmakers?.find(b => b.markets.some(m => m.key === 'h2h'))
+    const h2hOutcomes = h2hBookmaker?.markets.find(m => m.key === 'h2h')?.outcomes ?? []
+
+    // Totals: first bookmaker that has totals market (no fallback to avoid wrong bookmaker)
+    const totalsBookmaker = game.bookmakers?.find(b => b.markets.some(m => m.key === 'totals'))
+    console.log(`  Has totals bookmaker: ${totalsBookmaker ? totalsBookmaker.title : 'NONE'}`)
+
+    const totalsOutcomes = totalsBookmaker?.markets.find(m => m.key === 'totals')?.outcomes ?? []
+    console.log(`  Raw totals outcomes (${totalsOutcomes.length}): ${JSON.stringify(totalsOutcomes)}`)
+
+    // Build JSONB map keyed by line (e.g. "2.5")
+    let totalsMap: TotalsMap | null = null
+    if (totalsOutcomes.length > 0) {
+      totalsMap = {}
+      for (const o of totalsOutcomes) {
+        if (o.point == null) continue
+        const key = String(o.point)
+        if (!totalsMap[key]) totalsMap[key] = {}
+        totalsMap[key][o.name.toLowerCase() as 'over' | 'under'] = o.price
+      }
+      if (Object.keys(totalsMap).length === 0) totalsMap = null
+    }
+    console.log(`  Constructed totals: ${JSON.stringify(totalsMap)}`)
 
     records.push({
       match_id: game.id,
       home_team: game.home_team,
       away_team: game.away_team,
       match_date: game.commence_time,
-      home_odds:
-        outcomes.find((o: OddsOutcome) => o.name === game.home_team)?.price ??
-        null,
-      draw_odds:
-        outcomes.find((o: OddsOutcome) => o.name === 'Draw')?.price ?? null,
-      away_odds:
-        outcomes.find((o: OddsOutcome) => o.name === game.away_team)?.price ??
-        null,
-      bookmaker: bookmaker?.title ?? null,
-      haaland_score_odds: haalandOdds,
-      odegaard_score_odds: odegaardOdds,
+      home_odds: h2hOutcomes.find(o => o.name === game.home_team)?.price ?? null,
+      draw_odds: h2hOutcomes.find(o => o.name === 'Draw')?.price ?? null,
+      away_odds: h2hOutcomes.find(o => o.name === game.away_team)?.price ?? null,
+      bookmaker: h2hBookmaker?.title ?? null,
+      totals: totalsMap,
       updated_at: now,
     })
   }
+
+  console.log(`\nUpserting ${records.length} records...`)
 
   const { error } = await supabase
     .from('odds')
     .upsert(records, { onConflict: 'match_id' })
 
   if (error) {
+    console.error('Upsert error:', error.message, error)
     return new Response(JSON.stringify({ error: error.message, details: error }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -140,9 +129,17 @@ Deno.serve(async () => {
   const norwayCount = records.filter(
     r => r.home_team === 'Norway' || r.away_team === 'Norway'
   ).length
+  const withTotals = records.filter(r => r.totals !== null).length
+
+  console.log(`Done. Norway games: ${norwayCount}, games with totals: ${withTotals}`)
 
   return new Response(
-    JSON.stringify({ success: true, total: records.length, norway: norwayCount }),
+    JSON.stringify({
+      success: true,
+      total: records.length,
+      norway: norwayCount,
+      withTotals,
+    }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
   )
 })
