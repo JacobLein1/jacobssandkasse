@@ -25,18 +25,20 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
   if (!username) return { error: 'Brukernavn er påkrevd.' }
 
   const supabase = await createClient()
+ const { data, error } = await supabase.auth.signUp({
+  email,
+  password,
+  options: { data: { username } }
+})
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { username }
-    }
-  })
+if (error) return { error: error.message }
 
-  if (error) return { error: error.message }
+if (data.user) {
+  await supabase.from('profiles').update({ username }).eq('id', data.user.id)
+}
 
-  if (data.session) redirect('/')
+if (data.session) redirect('/')
+
   return { message: 'Sjekk e-posten din for å bekrefte kontoen, og logg deretter inn.' }
 }
 

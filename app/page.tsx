@@ -275,14 +275,25 @@ export default async function Home() {
                   </Link>
                 )}
               </div>
-              <form action={logout}>
-                <button type="submit" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Logg ut
-                </button>
-              </form>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/leaderboard"
+                  className="text-gray-400 hover:text-white text-sm transition-colors"
+                >
+                  🏆 Ledertavle
+                </Link>
+                <form action={logout}>
+                  <button type="submit" className="text-gray-400 hover:text-white text-sm transition-colors">
+                    Logg ut
+                  </button>
+                </form>
+              </div>
             </>
           ) : (
             <div className="flex gap-3 ml-auto">
+              <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
+                🏆 Ledertavle
+              </Link>
               <Link href="/login" className="text-gray-300 hover:text-white text-sm transition-colors">
                 Logg inn
               </Link>
