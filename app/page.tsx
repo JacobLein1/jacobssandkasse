@@ -53,50 +53,60 @@ export default async function Home() {
     <main className="min-h-screen bg-page text-white">
       <div className="max-w-xl mx-auto px-4 py-10">
 
-        {/* Header bar */}
-        <div className="flex items-center gap-4 mb-8 min-h-[2.5rem]">
-          <Logo />
-          {user && profile ? (
-            <>
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className="font-semibold text-sm truncate">{profile.username}</span>
-                <span className="text-gray-400 text-sm whitespace-nowrap">
-                  · kr {Number(profile.balance).toFixed(2)}
-                </span>
+        {/* Header */}
+        <div className="mb-8">
+          {/* Row 1: logo + user info */}
+          <div className="flex items-center gap-3 mb-3">
+            <Logo />
+            {user && profile ? (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate">{profile.username}</p>
+                  <p className="text-gray-400 text-xs">kr {Number(profile.balance).toFixed(2)}</p>
+                </div>
                 {profile.is_admin && (
                   <Link
                     href="/admin"
-                    className="text-xs bg-red-700/40 text-red-300 rounded px-2 py-1 hover:bg-red-700/60 transition-colors whitespace-nowrap"
+                    className="text-xs bg-red-700/40 text-red-300 rounded-lg px-2.5 py-1.5 hover:bg-red-700/60 transition-colors font-medium whitespace-nowrap"
                   >
                     Admin
                   </Link>
                 )}
-              </div>
-              <div className="flex items-center gap-3">
-                <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  🏆 Ledertavle
-                </Link>
-                <Link href="/bets" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Bets
-                </Link>
-                <Link href="/mine-spill" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Mine spill
-                </Link>
-                <LogoutButton />
-              </div>
-            </>
-          ) : (
-            <div className="flex gap-3 ml-auto items-center">
-              <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
+              </>
+            ) : (
+              <span className="flex-1" />
+            )}
+          </div>
+
+          {/* Row 2: nav buttons */}
+          {user && profile ? (
+            <div className="flex gap-2">
+              <Link href="/leaderboard"
+                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
                 🏆 Ledertavle
               </Link>
-              <Link href="/login" className="text-gray-300 hover:text-white text-sm transition-colors">
+              <Link href="/bets"
+                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                Bets
+              </Link>
+              <Link href="/mine-spill"
+                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                Mine spill
+              </Link>
+              <LogoutButton />
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Link href="/leaderboard"
+                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                🏆 Ledertavle
+              </Link>
+              <Link href="/login"
+                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
                 Logg inn
               </Link>
-              <Link
-                href="/register"
-                className="bg-red-700 hover:bg-red-600 text-white text-sm rounded-lg px-3 py-1.5 transition-colors"
-              >
+              <Link href="/register"
+                className="flex-1 bg-red-700 hover:bg-red-600 text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
                 Registrer deg
               </Link>
             </div>

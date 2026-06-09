@@ -139,6 +139,10 @@ export function UserBetsView({ bets, customBets, profileUserId }: Props) {
                       <td className="px-4 py-3">
                         <p className="font-medium">{flag(bet.home_team)} {bet.home_team}</p>
                         <p className="text-gray-400 text-xs">{flag(bet.away_team)} {bet.away_team}</p>
+                        <p className="text-gray-300 text-xs mt-1 sm:hidden">
+                          {outcomeLabel(bet)}
+                          <span className="text-gray-500 ml-1">@ {Number(bet.odds).toFixed(2)}</span>
+                        </p>
                       </td>
                       <td className="px-4 py-3 text-gray-300 hidden sm:table-cell">
                         {outcomeLabel(bet)}
