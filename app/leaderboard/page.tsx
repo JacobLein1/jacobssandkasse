@@ -45,6 +45,10 @@ export default async function LeaderboardPage() {
     <main className="min-h-screen bg-page text-white">
       <div className="max-w-xl mx-auto px-4 py-10">
 
+        <p className="text-xs text-gray-500 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 mb-6">
+          Trykk på et brukernavn for å se deres avgjorte spill.
+        </p>
+
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Logo size={36} />
@@ -118,17 +122,18 @@ export default async function LeaderboardPage() {
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <span
-                            className={`font-medium ${
-                              isMe ? 'text-red-300' : ''
-                            }`}
-                          >
-                            {profile.username ?? '(anonym)'}
-                          </span>
+                          {profile.username ? (
+                            <Link
+                              href={`/leaderboard/${encodeURIComponent(profile.username)}`}
+                              className={`font-medium hover:underline ${isMe ? 'text-red-300' : 'hover:text-white'}`}
+                            >
+                              {profile.username}
+                            </Link>
+                          ) : (
+                            <span className="font-medium text-gray-500">(anonym)</span>
+                          )}
                           {isMe && (
-                            <span className="ml-2 text-xs text-red-500">
-                              deg
-                            </span>
+                            <span className="ml-2 text-xs text-red-500">deg</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right font-mono font-semibold">

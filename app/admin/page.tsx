@@ -45,6 +45,9 @@ export default async function AdminPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/admin/custom-bets" className="text-red-400 hover:text-red-300 text-sm transition-colors">
+              Custom Bets →
+            </Link>
             <Link href="/admin/resultater" className="text-red-400 hover:text-red-300 text-sm transition-colors">
               Resultater →
             </Link>

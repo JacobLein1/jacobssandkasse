@@ -73,16 +73,13 @@ export default async function Home() {
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <Link
-                  href="/leaderboard"
-                  className="text-gray-400 hover:text-white text-sm transition-colors"
-                >
+                <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
                   🏆 Ledertavle
                 </Link>
-                <Link
-                  href="/mine-spill"
-                  className="text-gray-400 hover:text-white text-sm transition-colors"
-                >
+                <Link href="/bets" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Bets
+                </Link>
+                <Link href="/mine-spill" className="text-gray-400 hover:text-white text-sm transition-colors">
                   Mine spill
                 </Link>
                 <LogoutButton />
