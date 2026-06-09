@@ -44,7 +44,6 @@ export async function createCustomBet(
   const matchId = (formData.get('match_id') as string) || null
 
   if (!title) return { error: 'Tittel er påkrevd.' }
-  if (!description) return { error: 'Beskrivelse er påkrevd.' }
   if (!creatorSide) return { error: 'Påstanden er påkrevd.' }
   if (isNaN(amount) || amount < 10) return { error: 'Minste innsats er 10 kr.' }
 
@@ -129,7 +128,6 @@ export async function updateCustomBet(
   const amount = parseFloat(formData.get('amount') as string)
 
   if (!title) return { error: 'Tittel er påkrevd.' }
-  if (!description) return { error: 'Beskrivelse er påkrevd.' }
   if (!creatorSide) return { error: 'Påstanden er påkrevd.' }
   if (isNaN(amount) || amount < 10) return { error: 'Minste innsats er 10 kr.' }
 

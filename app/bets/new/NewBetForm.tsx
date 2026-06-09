@@ -30,8 +30,8 @@ export function NewBetForm({ matches }: { matches: Match[] }) {
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1.5">Beskrivelse</label>
-        <textarea name="description" required rows={3} placeholder="Beskriv bettet tydelig — hva avgjør utfallet?"
+        <label className="block text-sm text-gray-400 mb-1.5">Beskrivelse <span className="text-gray-600">(valgfritt)</span></label>
+        <textarea name="description" rows={3} placeholder="Beskriv bettet tydelig — hva avgjør utfallet?"
           className={`${inputCls} resize-none`} />
       </div>
 

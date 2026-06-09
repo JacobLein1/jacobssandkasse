@@ -113,7 +113,9 @@ export function CustomBetCard({ bet, userId, isAdmin }: Props) {
         </div>
       </div>
 
-      <p className="text-sm text-gray-400 mb-4 leading-relaxed">{bet.description}</p>
+      {bet.description && (
+        <p className="text-sm text-gray-400 mb-4 leading-relaxed">{bet.description}</p>
+      )}
 
       {/* Claim */}
       <div className="bg-detail rounded-xl px-4 py-3 mb-4">
@@ -157,8 +159,8 @@ export function CustomBetCard({ bet, userId, isAdmin }: Props) {
           <input type="hidden" name="bet_id" value={bet.id} />
           <input name="title" defaultValue={bet.title} required placeholder="Tittel" className={inputCls} />
           <textarea
-            name="description" defaultValue={bet.description} required rows={2}
-            placeholder="Beskrivelse"
+            name="description" defaultValue={bet.description} rows={2}
+            placeholder="Beskrivelse (valgfritt)"
             className={`${inputCls} resize-none`}
           />
           <input name="creator_side" defaultValue={bet.creator_side} required placeholder="Påstand" className={inputCls} />
