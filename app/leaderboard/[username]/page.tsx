@@ -1,37 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
-import { createClient as createServerClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
-import { flag } from '@/lib/flags'
-
-interface Bet {
-  home_team: string
-  away_team: string
-  outcome: string
-  odds: number
-  amount: number
-  potential_win: number
-  totals_line: number | null
-  status: 'won' | 'lost'
-  created_at: string
-}
+import { UserBetsView, type AllBet, type UserCustomBet } from '@/components/UserBetsView'
 
 interface ProfileRow {
+  id: string
   username: string | null
   balance: number
   total_wagered: number
-}
-
-function outcomeLabel(bet: Bet): string {
-  switch (bet.outcome) {
-    case 'home':  return `${bet.home_team} vinner`
-    case 'draw':  return 'Uavgjort'
-    case 'away':  return `${bet.away_team} vinner`
-    case 'over':  return `Over ${bet.totals_line ?? ''} mål`
-    case 'under': return `Under ${bet.totals_line ?? ''} mål`
-    default:      return bet.outcome
-  }
 }
 
 export default async function UserProfilePage({
@@ -42,30 +19,32 @@ export default async function UserProfilePage({
   const { username } = await params
   const decoded = decodeURIComponent(username)
 
-  const anonClient = createClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const [{ data: profileData }, { data: betsData }] = await Promise.all([
-    anonClient
+  const [{ data: profileData }, { data: betsData }, { data: customBetsData }] = await Promise.all([
+    supabase
       .from('profiles')
-      .select('username, balance, total_wagered')
+      .select('id, username, balance, total_wagered')
       .ilike('username', decoded)
       .single(),
-    anonClient.rpc('get_settled_bets_by_username', { p_username: decoded }),
+    supabase.rpc('get_all_bets_by_username', { p_username: decoded }),
+    supabase.rpc('get_custom_bets_by_username', { p_username: decoded }),
   ])
 
   if (!profileData) notFound()
 
   const profile = profileData as ProfileRow
-  const bets = (betsData ?? []) as Bet[]
+  const bets = (betsData ?? []) as AllBet[]
+  const customBets = (customBetsData ?? []) as UserCustomBet[]
 
-  const totalWon = bets.filter(b => b.status === 'won').reduce((s, b) => s + Number(b.potential_win), 0)
-  const totalLost = bets.filter(b => b.status === 'lost').reduce((s, b) => s + Number(b.amount), 0)
-
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const settled = bets.filter(b => b.settled)
+  const active = bets.filter(b => !b.settled)
+  const totalWon = settled.filter(b => b.won).reduce((s, b) => s + Number(b.potential_win), 0)
+  const totalLost = settled.filter(b => !b.won).reduce((s, b) => s + Number(b.amount), 0)
+  const net = totalWon - totalLost
 
   return (
     <main className="min-h-screen bg-page text-white">
@@ -86,10 +65,14 @@ export default async function UserProfilePage({
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="bg-card rounded-xl p-4 text-center">
-            <p className="text-xs text-gray-400 mb-1">Spill avgjort</p>
-            <p className="text-xl font-bold">{bets.length}</p>
+            <p className="text-xs text-gray-400 mb-1">Aktive spill</p>
+            <p className="text-xl font-bold text-yellow-400">{active.length}</p>
+          </div>
+          <div className="bg-card rounded-xl p-4 text-center">
+            <p className="text-xs text-gray-400 mb-1">Avgjorte spill</p>
+            <p className="text-xl font-bold">{settled.length}</p>
           </div>
           <div className="bg-card rounded-xl p-4 text-center">
             <p className="text-xs text-gray-400 mb-1">Total spilt</p>
@@ -97,52 +80,13 @@ export default async function UserProfilePage({
           </div>
           <div className="bg-card rounded-xl p-4 text-center">
             <p className="text-xs text-gray-400 mb-1">Netto</p>
-            <p className={`text-xl font-bold ${totalWon - totalLost > 0 ? 'text-green-400' : totalWon - totalLost < 0 ? 'text-red-400' : 'text-gray-400'}`}>
-              {totalWon - totalLost > 0 ? '+' : ''}{(totalWon - totalLost).toFixed(0)}
+            <p className={`text-xl font-bold ${net > 0 ? 'text-green-400' : net < 0 ? 'text-red-400' : 'text-gray-400'}`}>
+              {net > 0 ? '+' : ''}{net.toFixed(0)}
             </p>
           </div>
         </div>
 
-        {bets.length === 0 ? (
-          <p className="text-center text-gray-500 py-16 text-sm">Ingen avgjorte spill ennå.</p>
-        ) : (
-          <div className="bg-card border border-gray-800 rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-4 py-3 text-gray-400 font-medium">Kamp</th>
-                  <th className="text-left px-4 py-3 text-gray-400 font-medium hidden sm:table-cell">Spill</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium">Innsats</th>
-                  <th className="text-right px-4 py-3 text-gray-400 font-medium">Resultat</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bets.map((bet, i) => (
-                  <tr key={i} className={`border-b border-gray-800 last:border-0 ${i % 2 !== 0 ? 'bg-gray-900/30' : ''}`}>
-                    <td className="px-4 py-3">
-                      <p className="font-medium">{flag(bet.home_team)} {bet.home_team}</p>
-                      <p className="text-gray-400 text-xs">{flag(bet.away_team)} {bet.away_team}</p>
-                    </td>
-                    <td className="px-4 py-3 text-gray-300 hidden sm:table-cell">
-                      {outcomeLabel(bet)}
-                      <span className="text-gray-500 ml-1">@ {Number(bet.odds).toFixed(2)}</span>
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono">
-                      kr {Number(bet.amount).toFixed(0)}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono font-semibold">
-                      {bet.status === 'won' ? (
-                        <span className="text-green-400">+{Number(bet.potential_win).toFixed(0)}</span>
-                      ) : (
-                        <span className="text-red-400">−{Number(bet.amount).toFixed(0)}</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <UserBetsView bets={bets} customBets={customBets} profileUserId={profile.id} />
       </div>
     </main>
   )

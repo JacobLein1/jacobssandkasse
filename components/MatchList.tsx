@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { BetModal } from '@/components/BetModal'
+import { MatchBetsPanel } from '@/components/MatchBetsPanel'
 import { flag } from '@/lib/flags'
 
 export type TotalsMap = Record<string, { over?: number; under?: number }>
@@ -81,7 +82,7 @@ function OddsCell({
   )
 }
 
-function MatchCard({ match }: { match: MatchOdds }) {
+function MatchCard({ match, onShowBets }: { match: MatchOdds; onShowBets: () => void }) {
   const totalsLines = match.totals
     ? Object.entries(match.totals).sort(([a], [b]) => parseFloat(a) - parseFloat(b))
     : []
@@ -148,9 +149,19 @@ function MatchCard({ match }: { match: MatchOdds }) {
         <span>Oppdatert {timeAgo(match.updated_at)}</span>
       </div>
 
-      {!match.settled && (
-        <p className="text-center text-xs text-muted mt-3">Trykk for å spille →</p>
-      )}
+      <div className="mt-4 flex gap-2">
+        {!match.settled && (
+          <div className="flex-1 bg-detail rounded-xl px-4 py-2.5 text-center text-xs text-muted">
+            Trykk for å spille →
+          </div>
+        )}
+        <button
+          onClick={e => { e.stopPropagation(); onShowBets() }}
+          className={`${match.settled ? 'w-full' : 'flex-1'} bg-detail hover:bg-gray-600 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors`}
+        >
+          Se andres spill
+        </button>
+      </div>
     </article>
   )
 }
@@ -158,6 +169,7 @@ function MatchCard({ match }: { match: MatchOdds }) {
 export function MatchList({ matches, userId }: MatchListProps) {
   const router = useRouter()
   const [activeMatch, setActiveMatch] = useState<MatchOdds | null>(null)
+  const [betsMatch, setBetsMatch] = useState<MatchOdds | null>(null)
 
   const handleSuccess = useCallback(() => {
     setActiveMatch(null)
@@ -172,7 +184,7 @@ export function MatchList({ matches, userId }: MatchListProps) {
           onClick={() => !match.settled && setActiveMatch(match)}
           className={match.settled ? 'cursor-default' : 'cursor-pointer'}
         >
-          <MatchCard match={match} />
+          <MatchCard match={match} onShowBets={() => setBetsMatch(match)} />
         </div>
       ))}
 
@@ -183,6 +195,10 @@ export function MatchList({ matches, userId }: MatchListProps) {
           onClose={() => setActiveMatch(null)}
           onSuccess={handleSuccess}
         />
+      )}
+
+      {betsMatch && (
+        <MatchBetsPanel match={betsMatch} onClose={() => setBetsMatch(null)} />
       )}
     </>
   )
