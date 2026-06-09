@@ -75,16 +75,32 @@ interface Props {
   userId: string
 }
 
+type SortBy = 'none' | 'gevinst' | 'tap'
+
+function betResult(bet: RegularBet): number {
+  if (bet.status === 'won') return Number(bet.potential_win)
+  if (bet.status === 'lost') return -Number(bet.amount)
+  return Number(bet.potential_win)
+}
+
 export function MineSpillClient({ bets, customBets, userId }: Props) {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('begge')
   const [filter, setFilter] = useState<Filter>('alle')
+  const [sortBy, setSortBy] = useState<SortBy>('none')
 
   const activeBets = bets.filter(b => b.status === 'pending')
   const settledBets = bets.filter(b => b.status === 'won' || b.status === 'lost')
   const activeCustom = customBets.filter(b => b.status === 'open' || b.status === 'matched')
   const settledCustom = customBets.filter(b => ['won_creator', 'won_opponent', 'cancelled'].includes(b.status))
 
-  const visibleBets = filter === 'aktive' ? activeBets : filter === 'avgjorte' ? settledBets : bets
+  const filteredBets = filter === 'aktive' ? activeBets : filter === 'avgjorte' ? settledBets : bets
+  const visibleBets = sortBy === 'none'
+    ? filteredBets
+    : [...filteredBets].sort((a, b) =>
+        sortBy === 'gevinst'
+          ? betResult(b) - betResult(a)
+          : betResult(a) - betResult(b)
+      )
   const visibleCustom = filter === 'aktive' ? activeCustom : filter === 'avgjorte' ? settledCustom : customBets
 
   const totalAmount = bets.reduce((s, b) => s + Number(b.amount), 0)
@@ -134,6 +150,29 @@ export function MineSpillClient({ bets, customBets, userId }: Props) {
 
       {/* ── Vanlige spill ── */}
       {showBets && <h2 className="text-base font-semibold text-gray-300 mb-3">Vanlige spill</h2>}
+
+      {showBets && settledBets.length > 0 && (
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setSortBy(s => s === 'gevinst' ? 'none' : 'gevinst')}
+            className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+              sortBy === 'gevinst' ? 'bg-green-900/50 text-green-400 border border-green-800/60' : 'bg-detail text-gray-400 hover:text-white'
+            }`}
+          >
+            Høyest gevinst
+            <span className="font-mono text-xs">{sortBy === 'gevinst' ? '↑' : '—'}</span>
+          </button>
+          <button
+            onClick={() => setSortBy(s => s === 'tap' ? 'none' : 'tap')}
+            className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+              sortBy === 'tap' ? 'bg-red-900/40 text-red-400 border border-red-900/60' : 'bg-detail text-gray-400 hover:text-white'
+            }`}
+          >
+            Høyest tap
+            <span className="font-mono text-xs">{sortBy === 'tap' ? '↑' : '—'}</span>
+          </button>
+        </div>
+      )}
 
       {showBets && bets.length > 0 && filter === 'alle' && (
         <div className="grid grid-cols-3 gap-3 mb-4">
