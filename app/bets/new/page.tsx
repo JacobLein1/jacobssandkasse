@@ -28,7 +28,7 @@ export default async function NewBetPage() {
               <p className="text-gray-400 text-sm mt-0.5">Utfordre en annen bruker</p>
             </div>
           </div>
-          <Link href="/bets" className="text-gray-400 hover:text-white text-sm transition-colors">
+          <Link href="/bets" className="bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
             ← Tilbake
           </Link>
         </div>

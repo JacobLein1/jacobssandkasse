@@ -60,7 +60,7 @@ export default async function UserProfilePage({
               </p>
             </div>
           </div>
-          <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
+          <Link href="/leaderboard" className="bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
             ← Ledertavle
           </Link>
         </div>
