@@ -82,15 +82,15 @@ export default async function Home() {
           {user && profile ? (
             <div className="flex gap-2">
               <Link href="/leaderboard"
-                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
                 🏆 Ledertavle
               </Link>
               <Link href="/bets"
-                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
                 Bets
               </Link>
               <Link href="/mine-spill"
-                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
                 Mine spill
               </Link>
               <LogoutButton />
@@ -98,15 +98,15 @@ export default async function Home() {
           ) : (
             <div className="flex gap-2">
               <Link href="/leaderboard"
-                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
                 🏆 Ledertavle
               </Link>
               <Link href="/login"
-                className="flex-1 bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
                 Logg inn
               </Link>
               <Link href="/register"
-                className="flex-1 bg-red-700 hover:bg-red-600 text-white text-sm font-medium rounded-xl px-3 py-2 text-center transition-colors">
+                className="flex flex-1 items-center justify-center bg-red-700 hover:bg-red-600 text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
                 Registrer deg
               </Link>
             </div>

@@ -35,76 +35,58 @@ export default async function AdminPage() {
 
   return (
     <main className="min-h-screen bg-page text-white">
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
+      <div className="max-w-xl mx-auto px-4 py-10">
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-3">
             <Logo size={36} />
             <div>
               <h1 className="text-2xl font-bold">Admin</h1>
               <p className="text-gray-400 text-sm mt-0.5">Brukere og saldoer</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/admin/custom-bets" className="text-red-400 hover:text-red-300 text-sm transition-colors">
-              Custom Bets →
+          <div className="flex gap-2">
+            <Link href="/admin/custom-bets"
+              className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
+              Custom Bets
             </Link>
-            <Link href="/admin/resultater" className="text-red-400 hover:text-red-300 text-sm transition-colors">
-              Resultater →
+            <Link href="/admin/resultater"
+              className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
+              Resultater
             </Link>
-            <Link href="/" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link href="/"
+              className="flex flex-1 items-center justify-center bg-detail hover:bg-gray-600 text-gray-300 hover:text-white text-sm font-medium rounded-xl px-3 py-2 transition-colors">
               ← Tilbake
             </Link>
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-800">
-                <th className="text-left px-5 py-3 text-gray-400 font-medium">Bruker</th>
-                <th className="text-right px-5 py-3 text-gray-400 font-medium">Saldo</th>
-                <th className="text-right px-5 py-3 text-gray-400 font-medium">Juster</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u, i) => (
-                <tr
-                  key={u.id}
-                  className={`border-b border-gray-800 last:border-0 ${i % 2 === 0 ? '' : 'bg-gray-900/50'}`}
-                >
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{u.username ?? '(ingen)'}</span>
-                      {u.is_admin && (
-                        <span className="text-xs bg-red-700/40 text-red-300 rounded px-1.5 py-0.5">
-                          admin
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-gray-500 text-xs mt-0.5 font-mono">{u.id.slice(0, 8)}…</div>
-                  </td>
-                  <td className="px-5 py-3 text-right font-mono font-semibold">
-                    kr {Number(u.balance).toFixed(2)}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <BalanceEditor userId={u.id} currentBalance={Number(u.balance)} />
-                  </td>
-                </tr>
-              ))}
-              {users.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="px-5 py-8 text-center text-gray-500">
-                    Ingen brukere funnet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <p className="text-gray-600 text-xs mt-4 text-center">
+        <p className="text-gray-600 text-xs mb-4 text-center">
           Positivt beløp legger til, negativt trekker fra saldo.
         </p>
+
+        {users.length === 0 && (
+          <p className="text-center text-gray-500 py-16 text-sm">Ingen brukere funnet.</p>
+        )}
+
+        {users.map(u => (
+          <div key={u.id} className="bg-card border border-gray-800 rounded-2xl p-4 mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{u.username ?? '(ingen)'}</span>
+                  {u.is_admin && (
+                    <span className="text-xs bg-red-700/40 text-red-300 rounded px-1.5 py-0.5">admin</span>
+                  )}
+                </div>
+                <div className="text-gray-500 text-xs mt-0.5 font-mono">{u.id.slice(0, 8)}…</div>
+              </div>
+              <span className="font-mono font-semibold">kr {Number(u.balance).toFixed(2)}</span>
+            </div>
+            <BalanceEditor userId={u.id} currentBalance={Number(u.balance)} />
+          </div>
+        ))}
       </div>
     </main>
   )
