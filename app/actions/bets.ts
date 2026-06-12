@@ -27,11 +27,14 @@ export async function placeBet(_prev: BetState, formData: FormData): Promise<Bet
 
   const { data: match } = await supabase
     .from('odds')
-    .select('settled')
+    .select('settled, match_date')
     .eq('match_id', matchId)
     .single()
 
   if (match?.settled) return { error: 'Bettingen er lukket for denne kampen.' }
+  if (match?.match_date && new Date(match.match_date) <= new Date()) {
+    return { error: 'Kampen har allerede startet. Betting er stengt.' }
+  }
 
   const { error } = await supabase.rpc('place_bet', {
     p_match_id: matchId,

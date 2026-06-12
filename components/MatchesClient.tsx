@@ -32,7 +32,7 @@ export function MatchesClient({ matches, userId }: Props) {
         </div>
         {infoOpen && (
           <p className="text-sm text-gray-400 mt-2 leading-relaxed">
-            Alle brukere starter med <span className="text-white font-medium">1000 kr</span> i virtuell saldo og kan bette på VM-kampene. Velg en kamp, velg utfall og innsats — gevinster utbetales automatisk når resultatet er lagt inn. Man kan se andre spilleres saldo under 'Ledertavle', og det er om å samle mest penger innen VM.
+            Alle brukere starter med <span className="text-white font-medium">1000 kr</span> i virtuell saldo og kan bette på VM-kampene. Hver 7 dag tenker jeg at man får påfyll av 200kr på konto.  Velg en kamp, velg utfall og innsats — gevinster utbetales automatisk når resultatet er lagt inn. Man kan se andre spilleres saldo under 'Ledertavle', og det er om å samle mest penger innen VM.
           </p>
         )}
       </button>
@@ -42,9 +42,8 @@ export function MatchesClient({ matches, userId }: Props) {
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              statusFilter === s ? 'bg-red-700 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
-            }`}
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === s ? 'bg-red-700 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              }`}
           >
             {s === 'all' ? 'Alle' : s === 'open' ? 'Åpne' : 'Avgjorte'}
           </button>

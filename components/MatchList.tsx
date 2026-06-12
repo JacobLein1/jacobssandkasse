@@ -82,7 +82,7 @@ function OddsCell({
   )
 }
 
-function MatchCard({ match, onShowBets }: { match: MatchOdds; onShowBets: () => void }) {
+function MatchCard({ match, hasStarted, onShowBets }: { match: MatchOdds; hasStarted: boolean; onShowBets: () => void }) {
   const totalsLines = match.totals
     ? Object.entries(match.totals).sort(([a], [b]) => parseFloat(a) - parseFloat(b))
     : []
@@ -93,11 +93,15 @@ function MatchCard({ match, onShowBets }: { match: MatchOdds; onShowBets: () => 
         <p className="text-gray-400 text-sm capitalize">
           {fmtDate(match.match_date)}&nbsp;&middot;&nbsp;{fmtTime(match.match_date)}
         </p>
-        {match.settled && (
+        {match.settled ? (
           <span className="text-xs font-semibold bg-detail text-gray-400 rounded-full px-2.5 py-1">
             Avgjort
           </span>
-        )}
+        ) : hasStarted ? (
+          <span className="text-xs font-semibold bg-yellow-900/60 text-yellow-400 rounded-full px-2.5 py-1">
+            Pågår
+          </span>
+        ) : null}
       </div>
 
       <div className="flex items-center justify-between mb-6">
@@ -151,8 +155,8 @@ function MatchCard({ match, onShowBets }: { match: MatchOdds; onShowBets: () => 
 
       <div className="mt-4 flex gap-2">
         {!match.settled && (
-          <div className="flex-1 bg-detail rounded-xl px-4 py-2.5 text-center text-xs text-muted">
-            Trykk for å spille →
+          <div className={`flex-1 rounded-xl px-4 py-2.5 text-center text-xs ${hasStarted ? 'bg-yellow-900/30 text-yellow-600' : 'bg-detail text-muted'}`}>
+            {hasStarted ? 'Betting stengt' : 'Trykk for å spille →'}
           </div>
         )}
         <button
@@ -178,15 +182,18 @@ export function MatchList({ matches, userId }: MatchListProps) {
 
   return (
     <>
-      {matches.map(match => (
-        <div
-          key={match.match_id}
-          onClick={() => !match.settled && setActiveMatch(match)}
-          className={match.settled ? 'cursor-default' : 'cursor-pointer'}
-        >
-          <MatchCard match={match} onShowBets={() => setBetsMatch(match)} />
-        </div>
-      ))}
+      {matches.map(match => {
+        const hasStarted = !match.settled && new Date(match.match_date) <= new Date()
+        return (
+          <div
+            key={match.match_id}
+            onClick={() => !match.settled && !hasStarted && setActiveMatch(match)}
+            className={match.settled || hasStarted ? 'cursor-default' : 'cursor-pointer'}
+          >
+            <MatchCard match={match} hasStarted={hasStarted} onShowBets={() => setBetsMatch(match)} />
+          </div>
+        )
+      })}
 
       {activeMatch && (
         <BetModal
