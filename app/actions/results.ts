@@ -33,66 +33,16 @@ export async function settleMatch(
   if (isNaN(homeGoals) || homeGoals < 0) return { error: 'Ugyldig antall hjemmemål.' }
   if (isNaN(awayGoals) || awayGoals < 0) return { error: 'Ugyldig antall bortemål.' }
 
-  const { error: settledError } = await supabase
-    .from('odds')
-    .update({ settled: true })
-    .eq('match_id', matchId)
+  const { data, error } = await supabase.rpc('settle_match_result', {
+    p_match_id: matchId,
+    p_home_goals: homeGoals,
+    p_away_goals: awayGoals,
+  })
 
-  if (settledError) return { error: settledError.message }
-
-  // Fetch all pending bets for this match
-  const { data: bets, error: betsError } = await supabase
-    .from('bets')
-    .select('id, user_id, outcome, potential_win, totals_line')
-    .eq('match_id', matchId)
-    .eq('status', 'pending')
-
-  if (betsError) return { error: betsError.message }
-  if (!bets || bets.length === 0) {
-    revalidatePath('/admin/resultater')
-    return { success: true, won: 0, lost: 0 }
-  }
-
-  const totalGoals = homeGoals + awayGoals
-  let wonCount = 0
-  let lostCount = 0
-
-  for (const bet of bets) {
-    let won = false
-    switch (bet.outcome) {
-      case 'home':  won = homeGoals > awayGoals; break
-      case 'draw':  won = homeGoals === awayGoals; break
-      case 'away':  won = awayGoals > homeGoals; break
-      case 'over':  won = bet.totals_line != null && totalGoals > Number(bet.totals_line); break
-      case 'under': won = bet.totals_line != null && totalGoals < Number(bet.totals_line); break
-    }
-
-    await supabase
-      .from('bets')
-      .update({ status: won ? 'won' : 'lost' })
-      .eq('id', bet.id)
-
-    if (won) {
-      wonCount++
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('balance')
-        .eq('id', bet.user_id)
-        .single()
-
-      if (profile) {
-        await supabase
-          .from('profiles')
-          .update({ balance: Number(profile.balance) + Number(bet.potential_win) })
-          .eq('id', bet.user_id)
-      }
-    } else {
-      lostCount++
-    }
-  }
+  if (error) return { error: error.message }
 
   revalidatePath('/admin/resultater')
   revalidatePath('/mine-spill')
   revalidatePath('/')
-  return { success: true, won: wonCount, lost: lostCount }
+  return { success: true, won: (data as { won: number; lost: number }).won, lost: (data as { won: number; lost: number }).lost }
 }

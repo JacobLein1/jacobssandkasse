@@ -89,14 +89,11 @@ export default async function LeaderboardPage() {
                     <th className="text-left px-4 py-3 text-gray-400 font-medium">
                       Bruker
                     </th>
-                    <th className="text-right px-4 py-3 text-gray-400 font-medium">
-                      Saldo
-                    </th>
                     <th className="text-right px-4 py-3 text-gray-400 font-medium hidden sm:table-cell">
                       Spilt
                     </th>
                     <th className="text-right px-4 py-3 text-gray-400 font-medium">
-                      +/−
+                      Gevinst
                     </th>
                   </tr>
                 </thead>
@@ -136,14 +133,11 @@ export default async function LeaderboardPage() {
                             <span className="ml-2 text-xs text-red-500">deg</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono font-semibold">
-                          kr {Number(profile.balance).toFixed(2)}
-                        </td>
                         <td className="px-4 py-3 text-right font-mono text-sm text-gray-400 hidden sm:table-cell">
-                          kr {Number(profile.total_wagered).toFixed(2)}
+                          kr {Number(profile.total_wagered).toFixed(0)}
                         </td>
                         <td
-                          className={`px-4 py-3 text-right font-mono text-sm ${
+                          className={`px-4 py-3 text-right font-mono font-semibold ${
                             diff > 0
                               ? 'text-green-400'
                               : diff < 0
@@ -151,8 +145,7 @@ export default async function LeaderboardPage() {
                               : 'text-gray-500'
                           }`}
                         >
-                          {diff > 0 ? '+' : ''}
-                          {diff.toFixed(2)}
+                          {diff > 0 ? '+' : ''}{diff.toFixed(0)} kr
                         </td>
                       </tr>
                     )
