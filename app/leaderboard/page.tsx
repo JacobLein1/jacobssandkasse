@@ -8,9 +8,9 @@ interface Profile {
   username: string | null
   balance: number
   total_wagered: number
+  net_result: number
 }
 
-const STARTING_BALANCE = 1000
 const MEDALS = ['🥇', '🥈', '🥉']
 
 async function getLeaderboard(): Promise<Profile[]> {
@@ -18,10 +18,7 @@ async function getLeaderboard(): Promise<Profile[]> {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, username, balance, total_wagered')
-    .order('balance', { ascending: false })
+  const { data, error } = await supabase.rpc('get_leaderboard')
   if (error) throw error
   return data ?? []
 }
@@ -55,7 +52,7 @@ export default async function LeaderboardPage() {
             <div>
               <h1 className="text-2xl font-bold">🏆 Ledertavle</h1>
               <p className="text-gray-400 text-sm mt-0.5">
-                Startbalanse: 1&nbsp;000&nbsp;kr
+                Sortert på netto gevinst fra avgjorte spill
               </p>
             </div>
           </div>
@@ -93,14 +90,14 @@ export default async function LeaderboardPage() {
                       Spilt
                     </th>
                     <th className="text-right px-4 py-3 text-gray-400 font-medium">
-                      Gevinst
+                      Netto
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {profiles.map((profile, i) => {
                     const isMe = user?.id === profile.id
-                    const diff = Number(profile.balance) - STARTING_BALANCE
+                    const net = Number(profile.net_result)
                     const medal = MEDALS[i] ?? null
                     return (
                       <tr
@@ -138,14 +135,14 @@ export default async function LeaderboardPage() {
                         </td>
                         <td
                           className={`px-4 py-3 text-right font-mono font-semibold ${
-                            diff > 0
+                            net > 0
                               ? 'text-green-400'
-                              : diff < 0
+                              : net < 0
                               ? 'text-red-400'
                               : 'text-gray-500'
                           }`}
                         >
-                          {diff > 0 ? '+' : ''}{diff.toFixed(0)} kr
+                          {net > 0 ? '+' : ''}{net.toFixed(0)} kr
                         </td>
                       </tr>
                     )

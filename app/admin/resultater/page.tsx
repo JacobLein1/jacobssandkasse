@@ -10,6 +10,7 @@ interface Match {
   home_team: string
   away_team: string
   match_date: string
+  settled: boolean
 }
 
 function fmtDate(iso: string): string {
@@ -37,7 +38,7 @@ export default async function ResultaterPage() {
 
   const { data, error: matchesError } = await supabase
     .from('odds')
-    .select('match_id, home_team, away_team, match_date')
+    .select('match_id, home_team, away_team, match_date, settled')
     .order('match_date', { ascending: true })
 
   const matches = (data ?? []) as Match[]
@@ -94,7 +95,13 @@ export default async function ResultaterPage() {
                     {fmtDate(m.match_date)}
                   </td>
                   <td className="px-5 py-4">
-                    <ResultsEditor matchId={m.match_id} />
+                    {m.settled ? (
+                      <span className="text-xs font-semibold bg-green-900/40 text-green-400 rounded-full px-3 py-1">
+                        ✓ Avgjort
+                      </span>
+                    ) : (
+                      <ResultsEditor matchId={m.match_id} />
+                    )}
                   </td>
                 </tr>
               ))}
