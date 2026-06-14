@@ -11,13 +11,18 @@ interface Props {
 
 export function MatchesClient({ matches, userId }: Props) {
   const [activeTeam, setActiveTeam] = useState<string | null>(null)
-  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'settled'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'settled'>('open')
   const [infoOpen, setInfoOpen] = useState(false)
 
   const teams = [...new Set(matches.flatMap(m => [m.home_team, m.away_team]))].sort()
 
+  const now = new Date()
   const filtered = matches
-    .filter(m => statusFilter === 'all' || (statusFilter === 'open' ? !m.settled : m.settled))
+    .filter(m => {
+      if (statusFilter === 'settled') return m.settled
+      if (statusFilter === 'open') return !m.settled && new Date(m.match_date) > now
+      return true
+    })
     .filter(m => !activeTeam || m.home_team === activeTeam || m.away_team === activeTeam)
 
   return (
