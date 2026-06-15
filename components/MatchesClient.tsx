@@ -16,11 +16,10 @@ export function MatchesClient({ matches, userId }: Props) {
 
   const teams = [...new Set(matches.flatMap(m => [m.home_team, m.away_team]))].sort()
 
-  const now = new Date()
   const filtered = matches
     .filter(m => {
       if (statusFilter === 'settled') return m.settled
-      if (statusFilter === 'open') return !m.settled && new Date(m.match_date) > now
+      if (statusFilter === 'open') return !m.settled
       return true
     })
     .filter(m => !activeTeam || m.home_team === activeTeam || m.away_team === activeTeam)
